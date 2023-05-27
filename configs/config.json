@@ -1,0 +1,9 @@
+{
+    "server": {
+      "typeserver": "port",
+      "port": "3333"
+    },
+    "db":{
+      "url":"postgres://postgres:1234@localhost:5432/gowb"
+    }
+  }

@@ -20,6 +20,8 @@ func NewDeliveryRepository(db *db.Postgres) repo.Delivery {
 
 // Create implements repo.Delivery
 func (r *repoDelivery) Create(ctx context.Context, id string,delivery entity.Delivery) {
+
+
 	panic("unimplemented")
 }
 
