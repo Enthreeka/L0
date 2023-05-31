@@ -7,13 +7,16 @@ import (
 
 type Config struct {
 	Server struct {
-		TypeServer string `yaml:"typeserver"`
-		Port       string `yaml:"port"`
-	} `yaml:"server"`
+		TypeServer string `json:"typeserver"`
+		Port       string `json:"port"`
+	} `json:"server"`
 
 	Db struct {
-		URL string `yaml:"url"`
-	} `yaml:"db"`
+		URL string `json:"url"`
+	} `json:"db"`
+
+	Nats struct {
+	} `json:"nats"`
 }
 
 func New(path string) (*Config, error) {

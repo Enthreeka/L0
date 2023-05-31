@@ -12,5 +12,5 @@ type Item struct {
 	TotalPrice  int    `json:"total_price" db:"total_price"`
 	NmID        int    `json:"nm_id" db:"nm_id"`
 	Brand       string `json:"brand" db:"brand"`
-	Status      string `json:"status" db:"status"`
+	Status      int    `json:"status" db:"status"`
 }

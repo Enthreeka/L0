@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/Enthreeka/L0/internal/entity"
@@ -13,51 +14,37 @@ type cacheDelivery struct {
 	mu    sync.RWMutex
 }
 
-func NewDeliveryCache(cache map[string]entity.Delivery, mu sync.RWMutex) repo.Delivery {
+func NewDeliveryCache(cache map[string]entity.Delivery) repo.Delivery {
 	return &cacheDelivery{
 		cache: cache,
-		mu:    mu,
 	}
 }
 
-// Create implements repo.Delivery
-func (c *cacheDelivery) Create(ctx context.Context, id string, delivery entity.Delivery) {
+func (c *cacheDelivery) Create(ctx context.Context, id string, delivery entity.Delivery) error {
 	c.mu.RLock()
 	c.cache[id] = delivery
 	c.mu.RUnlock()
 
-	panic("unimplemented")
+	return nil
 }
 
-// DeleteByID implements repo.Delivery
-func (c *cacheDelivery) DeleteByID(ctx context.Context, id string) {
+func (c *cacheDelivery) DeleteByID(ctx context.Context, id string) error {
 
 	delete(c.cache, id)
 
-	panic("unimplemented")
+	return nil
 }
 
-// GetByID implements repo.Delivery
 func (c *cacheDelivery) GetByID(ctx context.Context, id string) (*entity.Delivery, error) {
 
-	
-	//data, _ := d.cache[id]
-	var data entity.Delivery
-	c.cache[id] = data
-	
+	data, ok := c.cache[id]
+	if !ok {
+		return nil, fmt.Errorf("%s", "Номер заказа не верный")
+	}
 
 	return &data, nil
-	//panic("unimplemented")
 }
 
-// func (d *OrderCache) GetByID(id string) data []entity.Order {
-// 	d.mu.RLock()
-// 	//data, _ := d.cache[id]
-// 	//var data []entity.Order
-// 	d.cache[id] = data
-// 	d.mu.RUnlock()
-
-// 	return data
-// }
-
-// Реализовать repo постгреса, реализовать cache
+func (*cacheDelivery) GetAll(ctx context.Context) (*[]entity.Delivery, error) {
+	panic("unimplemented")
+}

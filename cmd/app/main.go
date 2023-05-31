@@ -17,6 +17,6 @@ func main() {
 		log.Fatal("Failed to load config: %s", err)
 	}
 
-	log.Fatal("%s", server.Run(log, config))
+	log.Fatal("%v", server.Run(log, config))
 
 }

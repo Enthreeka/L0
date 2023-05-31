@@ -21,24 +21,33 @@ func NewOrderCache(cache map[string]entity.Order) repo.Order {
 }
 
 func (o *cacheOrder) Create(ctx context.Context, id string, order entity.Order) error {
-	o.mu.Lock()
+
+	if _, ok := o.cache[id]; ok {
+		return fmt.Errorf("Заказ с идентификатором %s уже существует в кэше", id)
+	}
+
 	o.cache[id] = order
-	o.mu.Unlock()
 
 	return nil
 }
 
-func (o *cacheOrder) DeleteByID(ctx context.Context, id string) {
+func (o *cacheOrder) DeleteByID(ctx context.Context, id string) error {
 
 	delete(o.cache, id)
+
+	return nil
 }
 
 func (o *cacheOrder) GetByID(ctx context.Context, id string) (*entity.Order, error) {
 
 	data, ok := o.cache[id]
 	if !ok {
-		return nil, fmt.Errorf("Номер заказа не верный")
+		return nil, fmt.Errorf("%s", "Номер заказа не верный")
 	}
 
 	return &data, nil
+}
+
+func (*cacheOrder) GetAll(ctx context.Context) (*[]entity.Order, error) {
+	panic("unimplemented")
 }
