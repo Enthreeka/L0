@@ -14,6 +14,7 @@ import (
 	"github.com/Enthreeka/L0/pkg/db"
 	"github.com/Enthreeka/L0/pkg/logger"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html"
 )
 
 func Run(log *logger.Logger, config *config.Config) error {
@@ -25,7 +26,10 @@ func Run(log *logger.Logger, config *config.Config) error {
 
 	defer db.Close()
 
-	app := fiber.New()
+	engine := html.New("./public", ".html")
+	app := fiber.New(fiber.Config{
+		Views: engine,
+	})
 
 	order := make(map[string]entity.Order)
 	payment := make(map[string]entity.Payment)
@@ -74,74 +78,18 @@ func Run(log *logger.Logger, config *config.Config) error {
 	once.Do(getFromDB)
 
 	// Слой обработчика
-	orderHandler := http.NewOrderHandler(orderService, deliveryService, itemService, paymentService)
+	orderHandler := http.NewOrderHandler(orderService, deliveryService, itemService, paymentService, log)
 
 	api := app.Group("/api")
 
-	api.Get("/:id", orderHandler.SearchOrder)
+	api.Get("/", orderHandler.SearchOrder)
+	api.Post("/search", orderHandler.SearchOrder)
 
 	log.Info("Starting http server: %s:%s", config.Server.TypeServer, config.Server.Port)
 
 	if err = app.Listen(fmt.Sprintf(":%s", config.Server.Port)); err != nil {
 		log.Fatal("Server listening failed:%s", err)
 	}
-
-	// payment := entity.Payment{
-	// 	Transaction:  "b563feb7b2b84b6test",
-	// 	RequestID:    "",
-	// 	Currency:     "USD",
-	// 	Provider:     "wbpay",
-	// 	Amount:       1817,
-	// 	PaymentDt:    1637907727,
-	// 	Bank:         "alpg",
-	// 	DeliveryCost: 1500,
-	// 	GoodsTotal:   317,
-	// 	CustomFee:    0,
-	// }
-
-	// item := entity.Item{
-	// 	ChrtID:      999123,
-	// 	TrackNumber: "WBILMTESTTRACK",
-	// 	Price:       343,
-	// 	RID:         "ab4219fsd087a764ae0btest",
-	// 	Name:        "ilya",
-	// 	Sale:        30,
-	// 	Size:        "0",
-	// 	TotalPrice:  316,
-	// 	NmID:        141241,
-	// 	Brand:       "versache",
-	// 	Status:      202,
-	// }
-
-	// delivery := entity.Delivery{
-	// 	Name:    "test",
-	// 	Phone:   "+9720000000",
-	// 	Zip:     "2639809",
-	// 	City:    "nino",
-	// 	Address: "Ploshad Mira 15",
-	// 	Region:  "Kraiot",
-	// 	Email:   "test@gmail.com",
-	// }
-
-	// order := entity.Order{
-	// 	TrackNumber:       "WBILMTESTTRACK",
-	// 	Entry:             "WBIL",
-	// 	Locale:            "en",
-	// 	InternalSignature: "",
-	// 	CustomerID:        "test",
-	// 	DeliveryService:   "meest",
-	// 	ShardKey:          "9",
-	// 	SmID:              99,
-	// 	DateCreated:       time.Now(),
-	// 	OofShard:          "1",
-	// }
-
-	// orderObj := usecase.Order{
-	// 	Order:    order,
-	// 	Payment:  payment,
-	// 	Item:     []entity.Item{item},
-	// 	Delivery: delivery,
-	// }
 
 	return nil
 }

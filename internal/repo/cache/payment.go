@@ -37,7 +37,7 @@ func (c *cachePayment) DeleteByID(ctx context.Context, id string) error {
 func (c *cachePayment) GetByID(ctx context.Context, id string) (*entity.Payment, error) {
 	data, ok := c.cache[id]
 	if !ok {
-		return nil, fmt.Errorf("Номер заказа не верный")
+		return nil, fmt.Errorf("Order number for payment invalible")
 	}
 
 	return &data, nil

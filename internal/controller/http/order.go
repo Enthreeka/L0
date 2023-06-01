@@ -2,9 +2,9 @@ package http
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Enthreeka/L0/internal/usecase"
+	"github.com/Enthreeka/L0/pkg/logger"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -13,48 +13,57 @@ type orderHandler struct {
 	deliveryService usecase.Delivery
 	itemService     usecase.Item
 	paymentService  usecase.Payment
+
+	log *logger.Logger
 }
 
-func NewOrderHandler(orderService usecase.Order, deliveryService usecase.Delivery, itemService usecase.Item, paymentService usecase.Payment) *orderHandler {
+func NewOrderHandler(orderService usecase.Order, deliveryService usecase.Delivery, itemService usecase.Item, paymentService usecase.Payment, log *logger.Logger) *orderHandler {
 	return &orderHandler{
 		orderService:    orderService,
 		deliveryService: deliveryService,
 		itemService:     itemService,
 		paymentService:  paymentService,
+		log:             log,
 	}
 }
 
 func (o *orderHandler) SearchOrder(c *fiber.Ctx) error {
 
-	id := c.FormValue("id")
-	fmt.Println(id)
+	if c.Method() == fiber.MethodPost {
+		o.log.Info("Start search order")
 
-	order, err := o.orderService.GetByID(context.Background(), "21")
-	if err != nil {
-		return err
+		id := c.FormValue("id")
+		o.log.Info("Get order with id: %s", id)
+
+		order, err := o.orderService.GetByID(context.Background(), id)
+		if err != nil {
+			return err
+		}
+
+		payment, err := o.paymentService.GetByID(context.Background(), id)
+		if err != nil {
+			return err
+		}
+
+		delivery, err := o.deliveryService.GetByID(context.Background(), id)
+		if err != nil {
+			return err
+		}
+
+		item, err := o.itemService.GetByID(context.Background(), id)
+		if err != nil {
+			return err
+		}
+
+		o.log.Info("Search order completed successfully")
+		return c.Render("index", fiber.Map{
+			"Order":    order,
+			"Payment":  payment,
+			"Delivery": delivery,
+			"Item":     item,
+		})
 	}
-
-	payment, err := o.paymentService.GetByID(context.Background(), "21")
-	if err != nil {
-		return err
-	}
-
-	delivery, err := o.deliveryService.GetByID(context.Background(), "21")
-	if err != nil {
-		return err
-	}
-
-	item, err := o.itemService.GetByID(context.Background(), "21")
-	if err != nil {
-		return err
-	}
-
-	return c.Render("index", fiber.Map{
-		"Order":    order,
-		"Payment":  payment,
-		"Delivery": delivery,
-		"Item":     item,
-	})
+	return c.Render("index", fiber.Map{})
 }
 
 // payment := entity.Payment{

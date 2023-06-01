@@ -26,6 +26,8 @@ func (o *cacheOrder) Create(ctx context.Context, id string, order entity.Order) 
 		return fmt.Errorf("Заказ с идентификатором %s уже существует в кэше", id)
 	}
 
+	
+
 	o.cache[id] = order
 
 	return nil
@@ -42,7 +44,7 @@ func (o *cacheOrder) GetByID(ctx context.Context, id string) (*entity.Order, err
 
 	data, ok := o.cache[id]
 	if !ok {
-		return nil, fmt.Errorf("%s", "Номер заказа не верный")
+		return nil, fmt.Errorf("%s", "Order number for order invalible")
 	}
 
 	return &data, nil

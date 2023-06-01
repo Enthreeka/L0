@@ -8,7 +8,7 @@ create table "order" (
     delivery_service varchar(20),
     shardkey varchar(10),
     sm_id integer,
-    date_created date,
+    date_created datetime,
     oof_shard varchar(10),
     primary key (order_uid)
 );

@@ -20,10 +20,6 @@ func NewItemCache(cache map[string][]entity.Item) repo.Item {
 
 func (c *cacheItem) Create(ctx context.Context, id string, item entity.Item) error {
 
-	if _, ok := c.cache[id]; ok {
-		return fmt.Errorf("Заказ с идентификатором %s уже существует в кэше", id)
-	}
-
 	c.cache[id] = append(c.cache[id], item)
 
 	return nil
@@ -39,7 +35,7 @@ func (c *cacheItem) GetByID(ctx context.Context, id string) (*[]entity.Item, err
 
 	data, ok := c.cache[id]
 	if !ok {
-		return nil, fmt.Errorf("Номер заказа не верный")
+		return nil, fmt.Errorf("%s", "Order number for item invalible")
 	}
 
 	return &data, nil

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Enthreeka/L0/internal/entity"
 	"github.com/Enthreeka/L0/internal/repo"
@@ -51,18 +52,19 @@ func (i *itemService) GetByID(ctx context.Context, id string) (*[]entity.Item, e
 	return item, nil
 }
 
-// SaveAllToCache implements Item
 func (i *itemService) SaveAllToCache(ctx context.Context) error {
 
-	order, err := i.db.GetAll(ctx)
+	item, err := i.db.GetAll(ctx)
 	if err != nil {
 		i.log.Error("Error to get all data from delivery db %v", err)
 		return err
 	}
 
-	for _, v := range *order {
+	for _, v := range *item {
 		i.cache.Create(ctx, v.OrderUID, v)
 	}
+
+	fmt.Println(item, "- SaveAllToCache")
 
 	return nil
 }
