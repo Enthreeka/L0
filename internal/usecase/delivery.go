@@ -58,8 +58,10 @@ func (d *deliveryService) SaveAllToCache(ctx context.Context) error {
 		return err
 	}
 
-	for _, v := range *delivery {
-		d.cache.Create(ctx, v.OrderUID, v)
+	if delivery != nil {
+		for _, v := range *delivery {
+			d.cache.Create(ctx, v.OrderUID, v)
+		}
 	}
 
 	return nil

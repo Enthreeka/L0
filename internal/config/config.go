@@ -16,6 +16,11 @@ type Config struct {
 	} `json:"db"`
 
 	Nats struct {
+		URL          string `json:"url"`
+		Subject      string `json:"subject"`
+		ClusterID    string `json:"clusterid"`
+		PublisherID  string `json:"publisherid"`
+		SubscriberID string `json:"subscriberid"`
 	} `json:"nats"`
 }
 

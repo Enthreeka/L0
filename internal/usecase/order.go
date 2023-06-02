@@ -59,8 +59,10 @@ func (o *orderService) SaveAllToCache(ctx context.Context) error {
 		return err
 	}
 
-	for _, v := range *order {
-		o.cache.Create(ctx, v.OrderUID, v)
+	if order != nil {
+		for _, v := range *order {
+			o.cache.Create(ctx, v.OrderUID, v)
+		}
 	}
 
 	return nil

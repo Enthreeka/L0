@@ -8,7 +8,7 @@ create table "order" (
     delivery_service varchar(20),
     shardkey varchar(10),
     sm_id integer,
-    date_created datetime,
+    date_created timestamp,
     oof_shard varchar(10),
     primary key (order_uid)
 );
@@ -64,9 +64,3 @@ create table item(
         references "order" (order_uid)
 
 ); 
-
-
-
-INSERT INTO "order" VALUES("b563feb7b2b84b6test","WBILMTESTTRACK","WBIL","en","","test","meest","9",99,"2021-11-26T06:22:19Z","1")
-INSERT INTO delivery VALUES()
-

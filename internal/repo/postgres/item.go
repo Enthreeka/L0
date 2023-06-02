@@ -25,6 +25,7 @@ func (r *repoItem) Create(ctx context.Context, id string, item entity.Item) erro
 
 	_, err := r.db.Pool.Exec(ctx, query, item.ChrtID, item.TrackNumber, id, item.Price, item.RID, item.Name, item.Sale,
 		item.Size, item.TotalPrice, item.NmID, item.Brand, item.Status)
+
 	return err
 }
 

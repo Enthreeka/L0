@@ -15,3 +15,10 @@ type Order struct {
 	DateCreated       time.Time `json:"date_created" db:"date_created"`
 	OofShard          string    `json:"oof_shard" db:"oof_shard"`
 }
+
+type Data struct {
+	Order    Order    `json:"order"`
+	Payment  Payment  `json:"payment"`
+	Item     []Item   `json:"item"`
+	Delivery Delivery `json:"delivery"`
+}

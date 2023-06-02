@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/Enthreeka/L0/internal/config"
+	"github.com/Enthreeka/L0/internal/controller/amqp"
 	"github.com/Enthreeka/L0/internal/controller/http"
 	"github.com/Enthreeka/L0/internal/entity"
 	"github.com/Enthreeka/L0/internal/repo/cache"
@@ -15,6 +16,7 @@ import (
 	"github.com/Enthreeka/L0/pkg/logger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
+	"github.com/nats-io/stan.go"
 )
 
 func Run(log *logger.Logger, config *config.Config) error {
@@ -73,6 +75,19 @@ func Run(log *logger.Logger, config *config.Config) error {
 			log.Error("Error saving items to cache:", err)
 		}
 	}
+
+	stanConn, err := stan.Connect(config.Nats.ClusterID, config.Nats.SubscriberID)
+	if err != nil {
+		log.Error("failed to connect to stan %s:", err)
+	}
+
+	log.Info("Starting subscriber: ClusterID:%s,SubscriberID:%s", config.Nats.ClusterID, config.Nats.SubscriberID)
+
+	defer stanConn.Close()
+
+	sub := amqp.NewSubcribe(stanConn, log, orderService, deliveryService, itemService, paymentService)
+
+	sub.Subscribe(config.Nats.Subject)
 
 	var once sync.Once
 	once.Do(getFromDB)

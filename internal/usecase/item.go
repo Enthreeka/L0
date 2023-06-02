@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Enthreeka/L0/internal/entity"
 	"github.com/Enthreeka/L0/internal/repo"
@@ -60,11 +59,11 @@ func (i *itemService) SaveAllToCache(ctx context.Context) error {
 		return err
 	}
 
-	for _, v := range *item {
-		i.cache.Create(ctx, v.OrderUID, v)
+	if item != nil {
+		for _, v := range *item {
+			i.cache.Create(ctx, v.OrderUID, v)
+		}
 	}
-
-	fmt.Println(item, "- SaveAllToCache")
 
 	return nil
 }

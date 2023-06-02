@@ -58,8 +58,10 @@ func (p *paymentService) SaveAllToCache(ctx context.Context) error {
 		return err
 	}
 
-	for _, v := range *payment {
-		p.cache.Create(ctx, v.OrderUID, v)
+	if payment != nil {
+		for _, v := range *payment {
+			p.cache.Create(ctx, v.OrderUID, v)
+		}
 	}
 
 	return nil

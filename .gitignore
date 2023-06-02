@@ -20,4 +20,10 @@
 # Go workspace file
 go.work
 
+# VS Code file
 .vscode
+
+# DB file
+postgresql.session.sql
+
+model.json

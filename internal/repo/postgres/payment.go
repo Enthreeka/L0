@@ -13,22 +13,6 @@ type repoPayment struct {
 	db *db.Postgres
 }
 
-func (r *repoPayment) GetAll(ctx context.Context) (*[]entity.Payment, error) {
-	query := `SELECT * FROM payment`
-
-	var payment []entity.Payment
-	err := pgxscan.Select(ctx, r.db.Pool, &payment, query)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(payment) > 0 {
-		return &payment, nil
-	} else {
-		return nil, err
-	}
-}
-
 func NewPaymentRepository(db *db.Postgres) repo.Payment {
 	return &repoPayment{
 		db: db,
@@ -41,6 +25,7 @@ func (r *repoPayment) Create(ctx context.Context, id string, payment entity.Paym
 
 	_, err := r.db.Pool.Exec(ctx, query, id, payment.Transaction, payment.RequestID, payment.Currency, payment.Provider, payment.Amount,
 		payment.PaymentDt, payment.Bank, payment.DeliveryCost, payment.GoodsTotal, payment.CustomFee)
+
 	return err
 }
 
@@ -64,6 +49,22 @@ func (r *repoPayment) GetByID(ctx context.Context, id string) (*entity.Payment, 
 
 	if len(payment) > 0 {
 		return &payment[0], nil
+	} else {
+		return nil, err
+	}
+}
+
+func (r *repoPayment) GetAll(ctx context.Context) (*[]entity.Payment, error) {
+	query := `SELECT * FROM payment`
+
+	var payment []entity.Payment
+	err := pgxscan.Select(ctx, r.db.Pool, &payment, query)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(payment) > 0 {
+		return &payment, nil
 	} else {
 		return nil, err
 	}
