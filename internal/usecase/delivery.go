@@ -45,6 +45,7 @@ func (d *deliveryService) GetByID(ctx context.Context, id string) (*entity.Deliv
 	delivery, err := d.cache.GetByID(ctx, id)
 	if err != nil {
 		d.log.Error("Error with get id %v", err)
+		return nil, err
 	}
 
 	return delivery, nil
@@ -62,6 +63,23 @@ func (d *deliveryService) SaveAllToCache(ctx context.Context) error {
 		for _, v := range *delivery {
 			d.cache.Create(ctx, v.OrderUID, v)
 		}
+	}
+
+	return nil
+}
+
+func (d *deliveryService) DeleteByID(ctx context.Context, id string) error {
+
+	err := d.db.DeleteByID(ctx, id)
+	if err != nil {
+		d.log.Error("%s:", err)
+		return err
+	}
+
+	err = d.cache.DeleteByID(ctx, id)
+	if err != nil {
+		d.log.Error("%s:", err)
+		return err
 	}
 
 	return nil

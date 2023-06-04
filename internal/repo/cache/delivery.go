@@ -39,7 +39,7 @@ func (c *cacheDelivery) GetByID(ctx context.Context, id string) (*entity.Deliver
 
 	data, ok := c.cache[id]
 	if !ok {
-		return nil, fmt.Errorf("%s", "Order number for delivery invalible")
+		return nil, fmt.Errorf("%s", "order number for delivery invalible")
 	}
 
 	return &data, nil

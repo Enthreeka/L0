@@ -45,7 +45,7 @@ func (o *orderService) GetByID(ctx context.Context, id string) (*entity.Order, e
 	order, err := o.cache.GetByID(ctx, id)
 	if err != nil {
 		o.log.Error("Error with get id %v", err)
-		//	return nil, err
+		return nil, err
 	}
 
 	return order, nil
@@ -63,6 +63,23 @@ func (o *orderService) SaveAllToCache(ctx context.Context) error {
 		for _, v := range *order {
 			o.cache.Create(ctx, v.OrderUID, v)
 		}
+	}
+
+	return nil
+}
+
+func (o *orderService) DeleteByID(ctx context.Context, id string) error {
+
+	err := o.db.DeleteByID(ctx, id)
+	if err != nil {
+		o.log.Error("%s:", err)
+		return err
+	}
+
+	err = o.cache.DeleteByID(ctx, id)
+	if err != nil {
+		o.log.Error("%s:", err)
+		return err
 	}
 
 	return nil

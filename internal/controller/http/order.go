@@ -62,56 +62,8 @@ func (o *orderHandler) SearchOrder(c *fiber.Ctx) error {
 			"Delivery": delivery,
 			"Item":     item,
 		})
+	} else {
+		o.log.Info("Get start page")
 	}
 	return c.Render("index", fiber.Map{})
 }
-
-// payment := entity.Payment{
-// 	Transaction:  "b563feb7b2b84b6test",
-// 	RequestID:    "",
-// 	Currency:     "USD",
-// 	Provider:     "wbpay",
-// 	Amount:       1817,
-// 	PaymentDt:    1637907727,
-// 	Bank:         "alpg",
-// 	DeliveryCost: 1500,
-// 	GoodsTotal:   317,
-// 	CustomFee:    0,
-// }
-
-// item := entity.Item{
-// 	ChrtID:      99912,
-// 	TrackNumber: "WBILMTESTTRACK",
-// 	Price:       343,
-// 	RID:         "ab4219fsd087a764ae0btest",
-// 	Name:        "ilya",
-// 	Sale:        30,
-// 	Size:        "0",
-// 	TotalPrice:  316,
-// 	NmID:        141241,
-// 	Brand:       "versache",
-// 	Status:      202,
-// }
-
-// delivery := entity.Delivery{
-// 	Name:    "test",
-// 	Phone:   "+9720000000",
-// 	Zip:     "2639809",
-// 	City:    "nino",
-// 	Address: "Ploshad Mira 15",
-// 	Region:  "Kraiot",
-// 	Email:   "test@gmail.com",
-// }
-
-// order := entity.Order{
-// 	TrackNumber:       "WBILMTESTTRACK",
-// 	Entry:             "WBIL",
-// 	Locale:            "en",
-// 	InternalSignature: "",
-// 	CustomerID:        "test",
-// 	DeliveryService:   "meest",
-// 	ShardKey:          "9",
-// 	SmID:              99,
-// 	DateCreated:       time.Now(),
-// 	OofShard:          "1",
-// }

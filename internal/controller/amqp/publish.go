@@ -2,10 +2,11 @@ package amqp
 
 import (
 	"encoding/json"
-	"time"
+	"fmt"
 
 	"github.com/Enthreeka/L0/internal/entity"
 	"github.com/Enthreeka/L0/pkg/logger"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/nats-io/stan.go"
 )
 
@@ -36,73 +37,78 @@ func (p *publishBroker) Publish(subject string) {
 
 func createData() *entity.Data {
 
+	UUID := fmt.Sprintf("b563eb7b2b84b6test%v", gofakeit.Number(1, 100))
+
+	fmt.Println(UUID, "- UUID")
+
 	order := entity.Order{
-		OrderUID:          "SAS",
-		TrackNumber:       "WBILMTESTTRACK",
-		Entry:             "WBIL",
-		Locale:            "en",
+		OrderUID:          UUID,
+		TrackNumber:       gofakeit.Word(),
+		Entry:             gofakeit.Word(),
+		Locale:            "ru",
 		InternalSignature: "",
-		CustomerID:        "test",
-		DeliveryService:   "meest",
-		ShardKey:          "9",
-		SmID:              99,
-		DateCreated:       time.Now(),
-		OofShard:          "1",
+		CustomerID:        gofakeit.UUID(),
+		DeliveryService:   gofakeit.Word(),
+		ShardKey:          gofakeit.Word(),
+		SmID:              gofakeit.Number(1, 100),
+		DateCreated:       gofakeit.Date(),
+		OofShard:          gofakeit.Word(),
 	}
 
 	payment := entity.Payment{
-		OrderUID:     "SAS",
-		Transaction:  "b563feb7b2b84b6test",
+		OrderUID:     UUID,
+		Transaction:  UUID,
 		RequestID:    "",
-		Currency:     "USD",
-		Provider:     "wbpay",
-		Amount:       1817,
-		PaymentDt:    1637907727,
-		Bank:         "alpg",
-		DeliveryCost: 1500,
-		GoodsTotal:   317,
-		CustomFee:    0,
+		Currency:     gofakeit.Currency().Short,
+		Provider:     gofakeit.Word(),
+		Amount:       gofakeit.Number(1, 100),
+		PaymentDt:    gofakeit.Number(100000, 10000000),
+		Bank:         gofakeit.Word(),
+		DeliveryCost: gofakeit.Number(100, 9999),
+		GoodsTotal:   gofakeit.Number(100, 1000),
+		CustomFee:    gofakeit.Number(0, 10),
 	}
 
 	item := []entity.Item{
 		{
-			OrderUID:    "SAS",
-			ChrtID:      909,
-			TrackNumber: "WBILMTESTTRACK",
-			Price:       343,
-			RID:         "ab4219fsd087a764ae0btest",
-			Name:        "ilya",
-			Sale:        30,
-			Size:        "0",
-			TotalPrice:  316,
-			NmID:        141241,
-			Brand:       "versache",
-			Status:      202,
-		}, {
-			OrderUID:    "SA",
-			ChrtID:      910,
-			TrackNumber: "WBILMTESTTRACK",
-			Price:       343,
-			RID:         "ab4219fsd087a764ae0btest",
-			Name:        "ilya",
-			Sale:        30,
-			Size:        "0",
-			TotalPrice:  316,
-			NmID:        141241,
-			Brand:       "versache",
-			Status:      202,
+			OrderUID:    UUID,
+			ChrtID:      gofakeit.Number(900, 1000),
+			TrackNumber: gofakeit.Word(),
+			Price:       gofakeit.Number(0, 99999),
+			RID:         gofakeit.Word(),
+			Name:        gofakeit.Name(),
+			Sale:        gofakeit.Number(0, 100),
+			Size:        string(gofakeit.Number(1, 5)),
+			TotalPrice:  gofakeit.Number(0, 9999),
+			NmID:        gofakeit.Number(100000, 200000),
+			Brand:       gofakeit.Word(),
+			Status:      gofakeit.Number(200, 500),
+		},
+		{
+			OrderUID:    UUID,
+			ChrtID:      gofakeit.Number(900, 1000),
+			TrackNumber: gofakeit.Word(),
+			Price:       gofakeit.Number(0, 99999),
+			RID:         gofakeit.Word(),
+			Name:        gofakeit.Name(),
+			Sale:        gofakeit.Number(0, 100),
+			Size:        gofakeit.Word(),
+			TotalPrice:  gofakeit.Number(0, 9999),
+			NmID:        gofakeit.Number(100000, 200000),
+			Brand:       gofakeit.Word(),
+			Status:      gofakeit.Number(200, 500),
 		},
 	}
 
 	delivery := entity.Delivery{
-		OrderUID: "SAS",
-		Name:     "test",
-		Phone:    "+9720000001",
-		Zip:      "2639809",
-		City:     "nino",
-		Address:  "Ploshad Mira 15",
-		Region:   "Kraiot",
-		Email:    "test@gmail.com",
+		OrderUID: UUID,
+		Name:     gofakeit.Name(),
+		Phone:    gofakeit.Phone(),
+		Zip:      gofakeit.Zip(),
+		City:     gofakeit.City(),
+		Address:  gofakeit.Address().City,
+		Region:   gofakeit.State(),
+		Email:    gofakeit.Email(),
 	}
 
 	orderObj := &entity.Data{

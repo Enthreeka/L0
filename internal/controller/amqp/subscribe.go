@@ -35,7 +35,6 @@ func NewSubcribe(stan stan.Conn, log *logger.Logger, orderService usecase.Order,
 func (p *subscribeBroker) Subscribe(subject string) {
 
 	p.stan.Subscribe(subject, func(msg *stan.Msg) {
-		fmt.Printf("%s\n", msg)
 
 		data := &entity.Data{}
 
@@ -44,7 +43,12 @@ func (p *subscribeBroker) Subscribe(subject string) {
 			fmt.Printf("failed to unmarshal data: %s", err)
 		}
 
-		p.orderService.CreateOrder(context.Background(), data.Order.OrderUID, data.Order)
+		//Можно добавить регулярные выражения для валидации входящих данных
+
+		err = p.orderService.CreateOrder(context.Background(), data.Order.OrderUID, data.Order)
+		if err != nil {
+			p.log.Error("failed to get order in %s from publisher %s:", subject, err)
+		}
 
 		for _, el := range data.Item {
 			p.itemService.CreateItem(context.Background(), el.OrderUID, el)
@@ -54,7 +58,58 @@ func (p *subscribeBroker) Subscribe(subject string) {
 
 		p.paymentService.CreatePayment(context.Background(), data.Payment.OrderUID, data.Payment)
 
-		//fmt.Println(data)
+		err = p.checkByID(context.Background(), data.Order.OrderUID)
+		if err != nil {
+			p.log.Error("error in the transaction %s:", err)
+		}
+
 	})
 
+}
+
+// Костыльная транзакция.
+// В случае, если кортеж хотя бы в одной из таблиц не создался, то кортежи в других таблицах с этим id удаляются.
+// В случае заказа с 2 item, если один удовлетворяет требованиям, а другой нет, то транзакция не будет применена.
+func (p *subscribeBroker) checkByID(ctx context.Context, id string) error {
+
+	countErr := 0
+
+	if _, err := p.orderService.GetByID(ctx, id); err != nil {
+		countErr++
+	}
+
+	if _, err := p.paymentService.GetByID(ctx, id); err != nil {
+		countErr++
+	}
+
+	if _, err := p.itemService.GetByID(ctx, id); err != nil {
+		countErr++
+	}
+
+	if _, err := p.deliveryService.GetByID(ctx, id); err != nil {
+		countErr++
+	}
+
+	if countErr > 0 {
+
+		if err := p.deliveryService.DeleteByID(ctx, id); err != nil {
+			return err
+		}
+
+		if err := p.itemService.DeleteByID(ctx, id); err != nil {
+			return err
+		}
+
+		if err := p.paymentService.DeleteByID(ctx, id); err != nil {
+			return err
+		}
+
+		if err := p.orderService.DeleteByID(ctx, id); err != nil {
+			return err
+		}
+
+		p.log.Info("Delete all filed in interconnected tables with")
+	}
+
+	return nil
 }

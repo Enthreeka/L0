@@ -46,6 +46,7 @@ func (i *itemService) GetByID(ctx context.Context, id string) (*[]entity.Item, e
 	item, err := i.cache.GetByID(ctx, id)
 	if err != nil {
 		i.log.Error("Error with get id %v", err)
+		return nil, err
 	}
 
 	return item, nil
@@ -63,6 +64,23 @@ func (i *itemService) SaveAllToCache(ctx context.Context) error {
 		for _, v := range *item {
 			i.cache.Create(ctx, v.OrderUID, v)
 		}
+	}
+
+	return nil
+}
+
+func (i *itemService) DeleteByID(ctx context.Context, id string) error {
+
+	err := i.db.DeleteByID(ctx, id)
+	if err != nil {
+		i.log.Error("%s:", err)
+		return err
+	}
+
+	err = i.cache.DeleteByID(ctx, id)
+	if err != nil {
+		i.log.Error("%s:", err)
+		return err
 	}
 
 	return nil

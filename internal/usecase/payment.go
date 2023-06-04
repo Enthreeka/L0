@@ -45,6 +45,7 @@ func (p *paymentService) GetByID(ctx context.Context, id string) (*entity.Paymen
 	payment, err := p.cache.GetByID(ctx, id)
 	if err != nil {
 		p.log.Error("Error with get id %v", err)
+		return nil, err
 	}
 
 	return payment, nil
@@ -66,4 +67,21 @@ func (p *paymentService) SaveAllToCache(ctx context.Context) error {
 
 	return nil
 
+}
+
+func (p *paymentService) DeleteByID(ctx context.Context, id string) error {
+
+	err := p.db.DeleteByID(ctx, id)
+	if err != nil {
+		p.log.Error("%s:", err)
+		return err
+	}
+
+	err = p.cache.DeleteByID(ctx, id)
+	if err != nil {
+		p.log.Error("%s:", err)
+		return err
+	}
+
+	return nil
 }

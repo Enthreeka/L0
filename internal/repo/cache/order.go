@@ -22,14 +22,9 @@ func NewOrderCache(cache map[string]entity.Order) repo.Order {
 
 func (o *cacheOrder) Create(ctx context.Context, id string, order entity.Order) error {
 
-	if _, ok := o.cache[id]; ok {
-		return fmt.Errorf("Заказ с идентификатором %s уже существует в кэше", id)
-	}
-
-	
-
+	o.mu.RLock()
 	o.cache[id] = order
-
+	o.mu.RUnlock()
 	return nil
 }
 
@@ -44,7 +39,7 @@ func (o *cacheOrder) GetByID(ctx context.Context, id string) (*entity.Order, err
 
 	data, ok := o.cache[id]
 	if !ok {
-		return nil, fmt.Errorf("%s", "Order number for order invalible")
+		return nil, fmt.Errorf("invalible order number: %s", id)
 	}
 
 	return &data, nil

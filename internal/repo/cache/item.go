@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/Enthreeka/L0/internal/entity"
 	"github.com/Enthreeka/L0/internal/repo"
@@ -10,6 +11,7 @@ import (
 
 type cacheItem struct {
 	cache map[string][]entity.Item
+	mu    sync.RWMutex
 }
 
 func NewItemCache(cache map[string][]entity.Item) repo.Item {
@@ -19,8 +21,9 @@ func NewItemCache(cache map[string][]entity.Item) repo.Item {
 }
 
 func (c *cacheItem) Create(ctx context.Context, id string, item entity.Item) error {
-
+	c.mu.RLock()
 	c.cache[id] = append(c.cache[id], item)
+	c.mu.RUnlock()
 
 	return nil
 }
@@ -35,7 +38,7 @@ func (c *cacheItem) GetByID(ctx context.Context, id string) (*[]entity.Item, err
 
 	data, ok := c.cache[id]
 	if !ok {
-		return nil, fmt.Errorf("%s", "Order number for item invalible")
+		return nil, fmt.Errorf("%s", "order number for item invalible")
 	}
 
 	return &data, nil

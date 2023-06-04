@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/Enthreeka/L0/internal/entity"
 	"github.com/Enthreeka/L0/internal/repo"
@@ -10,6 +11,7 @@ import (
 
 type cachePayment struct {
 	cache map[string]entity.Payment
+	mu    sync.RWMutex
 }
 
 func NewPaymentCache(cache map[string]entity.Payment) repo.Payment {
@@ -19,12 +21,9 @@ func NewPaymentCache(cache map[string]entity.Payment) repo.Payment {
 }
 
 func (c *cachePayment) Create(ctx context.Context, id string, payment entity.Payment) error {
-	if _, ok := c.cache[id]; ok {
-		return fmt.Errorf("%s", "Номер заказа не верный")
-	}
-
+	c.mu.RLock()
 	c.cache[id] = payment
-
+	c.mu.RUnlock()
 	return nil
 }
 
@@ -37,7 +36,7 @@ func (c *cachePayment) DeleteByID(ctx context.Context, id string) error {
 func (c *cachePayment) GetByID(ctx context.Context, id string) (*entity.Payment, error) {
 	data, ok := c.cache[id]
 	if !ok {
-		return nil, fmt.Errorf("Order number for payment invalible")
+		return nil, fmt.Errorf("%s", "order number for payment invalible")
 	}
 
 	return &data, nil
