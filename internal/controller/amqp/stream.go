@@ -1,9 +1,9 @@
 package amqp
 
 type Publish interface {
-	Publish(subject string)
+	Publish(subject string) error
 }
 
 type Subscribe interface {
-	Subscribe(subject string)
+	Subscribe(subject string) error
 }

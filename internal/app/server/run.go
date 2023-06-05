@@ -21,6 +21,7 @@ import (
 
 func Run(log *logger.Logger, config *config.Config) error {
 
+	//Подключение к бд
 	db, err := db.NewConnect(context.Background(), config.Db.URL)
 	if err != nil {
 		return err
@@ -28,11 +29,13 @@ func Run(log *logger.Logger, config *config.Config) error {
 
 	defer db.Close()
 
+	//Создание шаблона html
 	engine := html.New("./public", ".html")
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
 
+	//Хранилище данных в кеше
 	order := make(map[string]entity.Order)
 	payment := make(map[string]entity.Payment)
 	delivery := make(map[string]entity.Delivery)
@@ -76,6 +79,7 @@ func Run(log *logger.Logger, config *config.Config) error {
 		}
 	}
 
+	//Подключение к брокеру со стороны подписчика
 	stanConn, err := stan.Connect(config.Nats.ClusterID, config.Nats.SubscriberID)
 	if err != nil {
 		log.Error("failed to connect to stan %s:", err)
@@ -85,14 +89,18 @@ func Run(log *logger.Logger, config *config.Config) error {
 
 	defer stanConn.Close()
 
+	//Слой обработчика брокера
 	sub := amqp.NewSubcribe(stanConn, log, orderService, deliveryService, itemService, paymentService)
 
-	sub.Subscribe(config.Nats.Subject)
+	err = sub.Subscribe(config.Nats.Subject)
+	if err != nil {
+		return err
+	}
 
 	var once sync.Once
 	once.Do(getFromDB)
 
-	// Слой обработчика
+	// Слой обработчика http
 	orderHandler := http.NewOrderHandler(orderService, deliveryService, itemService, paymentService, log)
 
 	api := app.Group("/api")

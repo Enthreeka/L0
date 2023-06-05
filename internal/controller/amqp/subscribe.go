@@ -32,9 +32,10 @@ func NewSubcribe(stan stan.Conn, log *logger.Logger, orderService usecase.Order,
 	}
 }
 
-func (p *subscribeBroker) Subscribe(subject string) {
+func (p *subscribeBroker) Subscribe(subject string) error {
 
-	p.stan.Subscribe(subject, func(msg *stan.Msg) {
+	_, err := p.stan.Subscribe(subject, func(msg *stan.Msg) {
+		p.log.Info("get data in subject:%s from publisher", subject)
 
 		data := &entity.Data{}
 
@@ -62,9 +63,12 @@ func (p *subscribeBroker) Subscribe(subject string) {
 		if err != nil {
 			p.log.Error("error in the transaction %s:", err)
 		}
-
 	})
-
+	if err != nil {
+		p.log.Error("failed with subscribe method %v:", err)
+		return err
+	}
+	return nil
 }
 
 // Костыльная транзакция.
@@ -108,7 +112,7 @@ func (p *subscribeBroker) checkByID(ctx context.Context, id string) error {
 			return err
 		}
 
-		p.log.Info("Delete all filed in interconnected tables with")
+		p.log.Info("Delete all filed in interconnected tables with problems")
 	}
 
 	return nil

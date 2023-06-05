@@ -3,7 +3,6 @@ module github.com/Enthreeka/L0
 go 1.20
 
 require (
-	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/brianvoe/gofakeit/v6 v6.21.0
 	github.com/georgysavva/scany/v2 v2.0.0
 	github.com/gofiber/fiber/v2 v2.46.0

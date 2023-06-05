@@ -18,6 +18,7 @@ func main() {
 		log.Fatal("Failed to load config: %s", err)
 	}
 
+	//Подключение к брокеру со стороны отправителя
 	stanConn, err := stan.Connect(config.Nats.ClusterID, config.Nats.PublisherID)
 	if err != nil {
 		log.Error("failed to connect to stan %s:", err)
@@ -27,7 +28,11 @@ func main() {
 
 	defer stanConn.Close()
 
+	//Cлой обработчика со стороны брокера
 	stream := amqp.NewPublish(stanConn, log)
 
-	stream.Publish(config.Nats.Subject)
+	err = stream.Publish(config.Nats.Subject)
+	if err != nil {
+		log.Error("%s:", err)
+	}
 }

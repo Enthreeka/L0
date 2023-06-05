@@ -21,7 +21,7 @@ func NewOrderCache(cache map[string]entity.Order) repo.Order {
 }
 
 func (o *cacheOrder) Create(ctx context.Context, id string, order entity.Order) error {
-
+	
 	o.mu.RLock()
 	o.cache[id] = order
 	o.mu.RUnlock()
@@ -29,7 +29,6 @@ func (o *cacheOrder) Create(ctx context.Context, id string, order entity.Order) 
 }
 
 func (o *cacheOrder) DeleteByID(ctx context.Context, id string) error {
-
 	delete(o.cache, id)
 
 	return nil

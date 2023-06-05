@@ -23,16 +23,23 @@ func NewPublish(stan stan.Conn, log *logger.Logger) Publish {
 	}
 }
 
-func (p *publishBroker) Publish(subject string) {
+func (p *publishBroker) Publish(subject string) error {
 
 	p.log.Info("Publish the data")
 
 	order := createData()
 	o, _ := json.Marshal(order)
 
-	p.stan.Publish(subject, o)
+	err := p.stan.Publish(subject, o)
+
+	if err != nil {
+		p.log.Error("failed with publish method %v:", err)
+		return err
+	}
 
 	p.log.Info("Data publish successfully")
+
+	return nil
 }
 
 func createData() *entity.Data {
@@ -92,7 +99,7 @@ func createData() *entity.Data {
 			RID:         gofakeit.Word(),
 			Name:        gofakeit.Name(),
 			Sale:        gofakeit.Number(0, 100),
-			Size:        gofakeit.Word(),
+			Size:        string(gofakeit.Number(1, 5)),
 			TotalPrice:  gofakeit.Number(0, 9999),
 			NmID:        gofakeit.Number(100000, 200000),
 			Brand:       gofakeit.Word(),
